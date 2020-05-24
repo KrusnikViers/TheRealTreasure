@@ -13,12 +13,12 @@ class TestBasicHandlers(InBotTestCase):
         context = MagicMock()
         type(context).group = PropertyMock(return_value=None)
         basic.on_help_or_start(context)
-        context.send_response_message.assert_called_once_with('Template v1.0.0_help_for_private')
+        context.send_response_message.assert_called_once_with('TheRealTreasure v1.0.0_help_for_private')
 
     def test_help_or_start_group(self):
         context = MagicMock()
         basic.on_help_or_start(context)
-        context.send_response_message.assert_called_once_with('Template v1.0.0_help_for_group')
+        context.send_response_message.assert_called_once_with('TheRealTreasure v1.0.0_help_for_group')
 
     def test_user_report_sent(self):
         configuration = Configuration([])
