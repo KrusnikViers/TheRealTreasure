@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, BigInteger, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.database.base_model import Base
@@ -10,4 +10,4 @@ class Player(Base):
 
     name = Column(String, primary_key=True)
 
-    user = relationship("User")
+    user_id = Column(BigInteger, ForeignKey('users.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True)
