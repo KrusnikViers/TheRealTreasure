@@ -1,8 +1,8 @@
-# 2020-05-24 22:56:04.854166
+# 2020-05-24 23:07:53.976823
 from alembic import op
 import sqlalchemy as sa
 
-revision = '19e8c83f105b'
+revision = '84ac8fbca485'
 down_revision = 'bed9e7ecb63a'
 branch_labels = None
 depends_on = None
@@ -15,6 +15,8 @@ def upgrade():
     )
     op.create_table('players',
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('user_id', sa.BigInteger(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('name')
     )
     # ### end Alembic commands ###
