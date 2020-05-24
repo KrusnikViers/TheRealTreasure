@@ -8,7 +8,7 @@ from app.database.connection import DatabaseConnection
 from app.handlers.actions import Callback
 from app.handlers.context import Context
 from app.handlers.filters import Filter
-from app.handlers.impl import basic, routing
+from app.handlers.impl import basic, routing, scoring
 from app.handlers.util.reports import ReportsSender
 from app.i18n.translations import Translations
 

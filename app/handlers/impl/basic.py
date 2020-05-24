@@ -5,8 +5,7 @@ from app.handlers.util.reports import ReportsSender
 
 
 def on_help_or_start(context: Context):
-    message_template = _('{project}_help_for_group') if context.group else _('{project}_help_for_private')
-    context.send_response_message(message_template.format(project=PROJECT_FULL_NAME))
+    context.send_response_message(_('{project}_help').format(project=PROJECT_FULL_NAME))
 
 
 def on_reset_action(context: Context, new_action=None):

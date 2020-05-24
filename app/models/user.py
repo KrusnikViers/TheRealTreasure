@@ -13,7 +13,6 @@ class User(Base):
     name = Column(String, nullable=False)
 
     pending_actions = relationship("PendingAction")
-    players = relationship("Player")
 
     def mention_name(self):
         return '@' + self.login if self.login else self.name

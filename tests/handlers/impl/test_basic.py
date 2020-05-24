@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, PropertyMock
+
 from flexiconf import Configuration
 
 from app.database.scoped_session import ScopedSession
@@ -9,16 +10,10 @@ from tests.base import InBotTestCase
 
 
 class TestBasicHandlers(InBotTestCase):
-    def test_help_or_start_private(self):
-        context = MagicMock()
-        type(context).group = PropertyMock(return_value=None)
-        basic.on_help_or_start(context)
-        context.send_response_message.assert_called_once_with('TheRealTreasure v1.0.0_help_for_private')
-
-    def test_help_or_start_group(self):
+    def test_help_or_start(self):
         context = MagicMock()
         basic.on_help_or_start(context)
-        context.send_response_message.assert_called_once_with('TheRealTreasure v1.0.0_help_for_group')
+        context.send_response_message.assert_called_once_with('TheRealTreasure v1.0.0_help')
 
     def test_user_report_sent(self):
         configuration = Configuration([])
