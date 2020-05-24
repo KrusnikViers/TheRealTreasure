@@ -1,0 +1,5 @@
+{
+  "telegram_bot_token": "bot_token_from_botfather",
+  "superuser": "login_without_@",
+  "storage_directory": "path_to_store_things"
+}

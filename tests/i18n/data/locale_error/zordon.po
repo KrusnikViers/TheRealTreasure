@@ -1,0 +1,7 @@
+#: source.py:1 source.py:2
+msgid "translatable_string_id_%s"
+msgstr "Плохая, негодная %(строка)s!"
+
+#: source.py:3
+msgid "fuzzy_string"
+msgstr "Строка как строка"

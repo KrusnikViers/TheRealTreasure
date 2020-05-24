@@ -1,0 +1,20 @@
+#: handlers/impl/basic.py:15
+msgid "pending_action_cancelled"
+msgstr "Cancelled."
+
+#: handlers/impl/basic.py:20
+msgid "waiting_for_{user}_report"
+msgstr "{user}, I am ready to send your next message to support.(You may /cancel this action)"
+
+#: handlers/impl/basic.py:8
+msgid "{project}_help_for_group"
+msgstr "{project} - at your service!"
+
+#: handlers/impl/basic.py:8
+msgid "{project}_help_for_private"
+msgstr "{project} - at your service!"
+
+#: handlers/impl/basic.py:25
+msgid "{user}_report_sent"
+msgstr "{user}, your message has been forwarded. Thank you for your feedback!"
+

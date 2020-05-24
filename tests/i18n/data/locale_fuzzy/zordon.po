@@ -1,0 +1,7 @@
+#: source.py:1 source.py:2
+msgid "translatable_string_id"
+msgstr "Перевод"
+
+#: source.py:3
+msgid "fuzzzy_string"
+msgstr "Неоднозначная строка"

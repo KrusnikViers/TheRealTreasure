@@ -1,0 +1,22 @@
+#: handlers/impl/basic.py:15
+msgid "pending_action_cancelled"
+msgstr "Действие отменено."
+
+#: handlers/impl/basic.py:20
+msgid "waiting_for_{user}_report"
+msgstr ""
+"{user}, я готов передать ваше следующее сообщение своему администратору.\n"
+"Это действие можно отменить: /cancel"
+
+#: handlers/impl/basic.py:8
+msgid "{project}_help_for_group"
+msgstr "{project} - к вашим услугам!"
+
+#: handlers/impl/basic.py:8
+msgid "{project}_help_for_private"
+msgstr "{project} - к вашим услугам!"
+
+#: handlers/impl/basic.py:25
+msgid "{user}_report_sent"
+msgstr "{user}, ваше сообщение было передано. Спасибо за обратную связь!"
+
