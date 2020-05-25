@@ -56,6 +56,12 @@ class Dispatcher:
             self.command_handler(['report'], basic.on_user_report_request),
             self.callback_handler(Callback.CANCEL, basic.on_reset_action),
 
+            self.command_handler(['add'], scoring.add_player),
+            self.command_handler(['drop'], scoring.drop_player),
+            self.command_handler(['list'], scoring.list_players),
+            self.command_handler(['game'], scoring.add_game),
+            self.command_handler(['play'], scoring.matchup),
+
             # Special empty handler to let bot update user statuses even from non-message events.
             MessageHandler(Filters.all, self._make_handler(routing.dispatch_bare_message, [Filter.INCOMPLETE_DATA])),
         ]

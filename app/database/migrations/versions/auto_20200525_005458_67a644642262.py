@@ -1,8 +1,8 @@
-# 2020-05-25 00:35:08.281695
+# 2020-05-25 00:54:58.668280
 from alembic import op
 import sqlalchemy as sa
 
-revision = '83834cc621b1'
+revision = '67a644642262'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -12,6 +12,8 @@ def upgrade():
     op.create_table('players',
     sa.Column('id', sa.BigInteger().with_variant(sa.Integer(), 'sqlite'), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('mu', sa.Float(), nullable=False),
+    sa.Column('sigma', sa.Float(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_players'))
     )
     op.create_table('users',
