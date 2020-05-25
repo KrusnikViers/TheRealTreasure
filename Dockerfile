@@ -8,4 +8,5 @@ RUN pip3 install --no-cache-dir --upgrade -r /requirements.txt
 COPY app /instance/app
 COPY scripts /instance/scripts
 RUN  mkdir /instance/storage
+RUN  chmod a+x "/instance/scripts/docker_entry.sh"
 CMD  ["/instance/scripts/docker_entry.sh"]
