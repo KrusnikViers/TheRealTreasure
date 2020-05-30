@@ -9,13 +9,13 @@ class TrueSkillMatchmaker:
             self.player_id: int = player_id
             self.name: str = player_name
             self.rating: Rating = rating
-            self.pure_rating: float = 0
+            self.pure_rating: float = 0.0
 
     class Matchup:
         def __init__(self, team1_ids: list, team2_ids: list, quality: float):
-            self.team1_ids: team1_ids
-            self.team2_ids: team2_ids
-            self.quality: quality
+            self.team1_ids = team1_ids
+            self.team2_ids = team2_ids
+            self.quality = quality
 
     def __init__(self, true_skill: TrueSkill):
         self.ts = true_skill
