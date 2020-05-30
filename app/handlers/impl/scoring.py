@@ -1,23 +1,10 @@
-import itertools
-import math
-
-from trueskill import MU, SIGMA, BETA, Rating, TrueSkill
+from trueskill import TrueSkill
 
 from app.handlers.context import Context
+from app.handlers.impl.trueskill import TrueSkillMatchmaker
 from app.models.all import Player
 
-
-def default_ts():
-    return TrueSkill(draw_probability=0.0)
-
-
-def win_probability(team1, team2):
-    delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
-    sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
-    size = len(team1) + len(team2)
-    denom = math.sqrt(size * (BETA * BETA) + sum_sigma)
-    ts = default_ts()
-    return ts.cdf(delta_mu / denom)
+_true_skill = TrueSkill(draw_probability=0.0)
 
 
 def add_player(context: Context):
@@ -30,7 +17,7 @@ def add_player(context: Context):
         context.send_response_message('exists')
         return
 
-    player = Player(name=player_name, mu=MU, sigma=SIGMA)
+    player = Player(name=player_name, mu=_true_skill.mu, sigma=_true_skill.sigma)
     context.session.add(player)
     context.send_response_message('created {}'.format(player.name))
 
@@ -48,12 +35,21 @@ def drop_player(context: Context):
     context.send_response_message('deleted {}'.format(player_name))
 
 
-def list_players(context: Context):
+def _create_tsmm(context: Context):
+    tsmm = TrueSkillMatchmaker(_true_skill)
     players = context.session.query(Player).all()
-    players.sort(key=lambda p: p.mu, reverse=True)
     for player in players:
-        context.send_response_message(
-            'player {}: score {}, deviation {}'.format(player.name, round(player.mu, 2), round(player.sigma, 2)))
+        tsmm.add_player(player.id, player.name, player.mu, player.sigma)
+    return tsmm
+
+
+def list_players(context: Context):
+    players_list = _create_tsmm(context).players_list()
+    for player in players_list:
+        context.send_response_message('{}: {} ({}:{})'.format(player.name,
+                                                              round(player.pure_rating, 2),
+                                                              round(player.rating.mu, 2),
+                                                              round(player.rating.sigma, 2)))
 
 
 def add_game(context: Context):
@@ -61,26 +57,18 @@ def add_game(context: Context):
     if len(args) < 2:
         return
 
+    tsmm = _create_tsmm(context)
     winner_team_size = int(args[0])
-    winners = [context.session.query(Player).filter(Player.name == name).first() for name in
+    winners = [context.session.query(Player).filter(Player.name == name).first().id for name in
                args[1:1 + winner_team_size]]
-    losers = [context.session.query(Player).filter(Player.name == name).first() for name in args[1 + winner_team_size:]]
+    losers = [context.session.query(Player).filter(Player.name == name).first().id for name in
+              args[1 + winner_team_size:]]
+    tsmm.update(winners, losers)
 
-    for player in winners + losers:
-        if not player:
-            context.send_response_message('player not found')
-            return
-
-    winners_ratings = [Rating(mu=player.mu, sigma=player.sigma) for player in winners]
-    losers_ratings = [Rating(mu=player.mu, sigma=player.sigma) for player in losers]
-
-    new_winners_ratings, new_losers_ratings = default_ts().rate([winners_ratings, losers_ratings])
-    for i in range(0, len(new_winners_ratings)):
-        winners[i].mu = new_winners_ratings[i].mu
-        winners[i].sigma = new_winners_ratings[i].sigma
-    for i in range(0, len(new_losers_ratings)):
-        losers[i].mu = new_losers_ratings[i].mu
-        losers[i].sigma = new_losers_ratings[i].sigma
+    all_players = context.session.query(Player).all()
+    for player in all_players:
+        player.mu = tsmm.players[player.id].rating.mu
+        player.sigma = tsmm.players[player.id].rating.sigma
 
     list_players(context)
 
@@ -90,34 +78,14 @@ def matchup(context: Context):
     if len(args) < 2:
         return
 
-    players = [context.session.query(Player).filter(Player.name == name).first() for name in args]
-    for player in players:
-        if not player:
-            context.send_response_message('player not found')
-            return
+    players = [context.session.query(Player).filter(Player.name == name).first().id for name in args]
+    ttsm = _create_tsmm(context)
+    matchups = ttsm.matchups(players)
 
-    ratings = [Rating(mu=player.mu, sigma=player.sigma) for player in players]
+    def names_list(ttsm: TrueSkillMatchmaker, ids):
+        return ', '.join([ttsm.players[player_id].name for player_id in ids])
 
-    def all_matchups(players_left):
-        if players_left:
-            current = players_left[0]
-            options = all_matchups(players_left[1:])
-            result = []
-            for option in options:
-                result.append((option[0], option[1] + [current]))
-                result.append((option[0] + [current], option[1]))
-            return result
-        return [([], [])]
-
-    matchups = all_matchups(range(0, len(players)))
-
-    qualities = []
-    ts = default_ts()
-    for setup in matchups:
-        if setup[0] and setup[1]:
-            qualities.append((ts.quality([[ratings[i] for i in setup[0]], [ratings[i] for i in setup[1]]]), setup))
-    qualities.sort(reverse=True)
-    for qual in qualities[:20:2]:
-        team_1 = [players[i].name for i in qual[1][0]]
-        team_2 = [players[i].name for i in qual[1][1]]
-        context.send_response_message('{} vs {} : {}'.format(', '.join(team_1), ', '.join(team_2), round(qual[0], 3)))
+    for matchup in matchups[:10]:
+        context.send_response_message(
+            '{}: {} vs {}'.format(round(matchup.quality, 3),
+                                  names_list(ttsm, matchup.team1_ids), names_list(ttsm, matchup.team2_ids)))
