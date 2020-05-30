@@ -56,7 +56,8 @@ class TrueSkillMatchmaker:
             if player_id not in team_won and player_id not in team_lost:
                 sigma_diff = self.ts.sigma - player_stats.rating.sigma
                 if sigma_diff > 0:
-                    player_stats.rating.sigma += sigma_diff * 0.05
+                    old_rating = player_stats.rating
+                    player_stats.rating = Rating(old_rating.mu, old_rating.sigma + sigma_diff * 0.05)
 
     def players_list(self) -> list:
         for player in self.players.values():
