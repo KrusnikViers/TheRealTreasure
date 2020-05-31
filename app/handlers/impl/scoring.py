@@ -86,12 +86,12 @@ def matchup(context: Context):
         return ', '.join([ttsm.players[player_id].name for player_id in ids])
 
     def quality_name(quality: float):
-        if quality >= 0.52:
-            return 'Fair'
-        elif quality >= 0.48:
-            return 'Unbalanced'
+        if quality >= 0.55:
+            return 'Good'
+        elif quality >= 0.45:
+            return 'Unstable'
         else:
-            return 'Unfair'
+            return 'Poor'
 
     desc_list = []
     for matchup in matchups[:6]:
