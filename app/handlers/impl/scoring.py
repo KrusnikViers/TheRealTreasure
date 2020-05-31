@@ -45,11 +45,11 @@ def _create_tsmm(context: Context):
 
 def list_players(context: Context):
     players_list = _create_tsmm(context).players_list()
+    desc_list = []
     for player in players_list:
-        context.send_response_message('{}: {} ({}:{})'.format(player.name,
-                                                              round(player.pure_rating, 2),
-                                                              round(player.rating.mu, 2),
-                                                              round(player.rating.sigma, 2)))
+        desc_list.append('{}: {} ({}:{})'.format(player.name, round(player.pure_rating, 1),
+                                                 round(player.rating.mu, 2), round(player.rating.sigma, 2)))
+    context.send_response_message('\n'.join(desc_list))
 
 
 def add_game(context: Context):
@@ -85,7 +85,18 @@ def matchup(context: Context):
     def names_list(ttsm: TrueSkillMatchmaker, ids):
         return ', '.join([ttsm.players[player_id].name for player_id in ids])
 
-    for matchup in matchups[:10]:
-        context.send_response_message(
-            '{}: {} vs {}'.format(round(matchup.quality, 3),
-                                  names_list(ttsm, matchup.team1_ids), names_list(ttsm, matchup.team2_ids)))
+    def quality_name(quality: float):
+        if quality >= 0.52:
+            return 'Fair'
+        elif quality >= 0.48:
+            return 'Unbalanced'
+        else:
+            return 'Unfair'
+
+    desc_list = []
+    for matchup in matchups[:6]:
+        desc_list.append('{} option (score: {})\n{} vs {}\n{}% vs {}%\n'.format(
+            quality_name(matchup.quality), round(matchup.quality, 2),
+            names_list(ttsm, matchup.team1_ids), names_list(ttsm, matchup.team2_ids),
+            round(matchup.team1_win_chance * 100.0, 1), round(matchup.team2_win_chance * 100.0, 1)))
+    context.send_response_message('\n'.join(desc_list))
